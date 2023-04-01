@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/x-saim/tinyapp/issues"
   },
-  "homepage": "https://github.com/x-saim/tinyapp#readme"
+  "homepage": "https://github.com/x-saim/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
