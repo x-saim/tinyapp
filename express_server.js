@@ -11,8 +11,14 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+// create new route containing json string of urlDatabase obj
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
+});
+
+// sample for creating a new route and adding some context with HTML.
+app.get("/hello", (req,res) =>{
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
