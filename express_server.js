@@ -70,10 +70,7 @@ app.get("/u/:id", (req,res) => {
 
 //Add a POST route that removes a URL resource.
 app.post("/urls/:id/delete",(req,res) => {
-  console.log(req.params.id); //check
-  console.log(urlDatabase);
-  delete urlDatabase[req.params.id];
-  console.log(urlDatabase);
+  delete urlDatabase[req.params.id]
   res.redirect("/urls");
 });
 
