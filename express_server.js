@@ -2,8 +2,11 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+/*
+Function creates a string of random characters from a alphanumeric character string.
+*/
 function generateRandomString() {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; //62 characters
   let result = '';
   for (let i = 0; i < 6; i++) {
     result += chars[Math.floor(Math.random() * chars.length)];
