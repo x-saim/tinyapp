@@ -2,7 +2,15 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-generateRandomString()
+function generateRandomString() {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
 
 //set ejs as the view engine.
 app.set("view engine","ejs");
@@ -12,7 +20,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); //express middleware
 
 app.get("/", (req, res) => {
   res.send("Hello!");
