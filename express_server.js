@@ -39,20 +39,15 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  //console.log(req.body); // Log the POST request body to the console
-
   ///edge case: if user inputs url without http/https protocol
   let longURL = req.body["longURL"];
   if (!longURL.includes("http://") && !longURL.includes("https://")) {
     longURL = "https://" + longURL;
   }
-
   const id = generateRandomString();
   urlDatabase[id] = longURL;
   res.redirect(`/urls/${id}`); // redirect the client to the /urls/:id route for the newly created short URL
-
   }
-    
 );
 
 //separate urls for each short url id
@@ -66,6 +61,13 @@ app.get("/u/:id", (req,res) => {
   const longURL = urlDatabase[req.params.id];
   res.redirect(longURL);
 });
+
+//a POST route that updates a URL resource
+app.post("/urls/:id", (req,res) => {
+  console.log(req.body);
+ // urlDatabase[id] = 
+ res.redirect("/urls");
+})
 
 
 //Add a POST route that removes a URL resource.
