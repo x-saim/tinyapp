@@ -56,6 +56,7 @@ app.get("/urls/:id", (req,res) => {
   res.render("urls_show",templateVars);
 });
 
+
 //redirect short urls to long urls
 app.get("/u/:id", (req,res) => {
   const longURL = urlDatabase[req.params.id];
@@ -63,11 +64,13 @@ app.get("/u/:id", (req,res) => {
 });
 
 //a POST route that updates a URL resource
-app.post("/urls/:id", (req,res) => {
-  console.log(req.body);
- // urlDatabase[id] = 
- res.redirect("/urls");
-})
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id; //assignign ID from URL /urls/<%= id %> to var id.
+  const newLongURL = req.body.longURL;
+  urlDatabase[id] = newLongURL;
+  console.log(urlDatabase);
+  res.redirect("/urls");
+});
 
 
 //Add a POST route that removes a URL resource.
