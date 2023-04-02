@@ -40,18 +40,21 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body["longURL"];
-  console.log(urlDatabase);
-  res.redirect(`/urls/${shortURL}`); // redirect the client to the /urls/:id route for the newly created short URL
-
-
-  //res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const id = generateRandomString();
+  urlDatabase[id] = req.body["longURL"];
+  console.log(urlDatabase); // TO BE REMOVED
+  res.redirect(`/urls/${id}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
 
 app.get("/urls/:id", (req,res) => {
   const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show",templateVars);
+});
+
+//redirect short urls to long urls
+app.get("/u/:id", (req,res) => {
+  const longURL = urlDatabase[req.params.id];
+  res.redirect(longURL);
 });
 
 
