@@ -5,14 +5,14 @@ const PORT = 8080; // default port 8080
 /*
 Function creates a string of random characters from a alphanumeric character string.
 */
-function generateRandomString() {
+const generateRandomString = () => {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; //62 characters
   let result = '';
   for (let i = 0; i < 6; i++) {
     result += chars[Math.floor(Math.random() * chars.length)];
   }
   return result;
-}
+};
 
 
 //set ejs as the view engine.
@@ -39,18 +39,23 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  //console.log(req.body); // Log the POST request body to the console
 
   ///edge case: if user inputs url without http/https protocol
-  if (!(req.body["longURL"].includes("http://")) || !(req.body["longURL"].includes("https://"))) {
-    req.body["longURL"] = "https://" + req.body["longURL"];
+  let longURL = req.body["longURL"];
+  if (!longURL.includes("http://") && !longURL.includes("https://")) {
+    longURL = "https://" + longURL;
   }
 
   const id = generateRandomString();
-  urlDatabase[id] = req.body["longURL"];
+  urlDatabase[id] = longURL;
   res.redirect(`/urls/${id}`); // redirect the client to the /urls/:id route for the newly created short URL
-});
 
+  }
+    
+);
+
+//separate urls for each short url id
 app.get("/urls/:id", (req,res) => {
   const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
   res.render("urls_show",templateVars);
@@ -63,6 +68,14 @@ app.get("/u/:id", (req,res) => {
 });
 
 
+//Add a POST route that removes a URL resource.
+app.post("/urls/:id/delete",(req,res) => {
+  console.log(req.params.id);
+  console.log(urlDatabase);
+  delete urlDatabase[req.params.id];
+  console.log(urlDatabase);
+  res.redirect("/urls");
+});
 
 // create new route containing json string of urlDatabase obj
 app.get("/urls.json", (req,res) => {
