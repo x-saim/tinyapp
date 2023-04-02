@@ -39,7 +39,15 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  console.log(req.body); // Log the POST request body to the console'
+  console.log(req.body["longURL"]);
+
+  ///edge case: if user inputs url without http/https protocol
+  if (!(req.body["longURL"].includes("http://")) || !(req.body["longURL"].includes("https://"))) {
+    req.body["longURL"] = "https://" + req.body["longURL"];
+    console.log(req.body["longURL"]);
+  }
+
   const id = generateRandomString();
   urlDatabase[id] = req.body["longURL"];
   console.log(urlDatabase); // TO BE REMOVED
