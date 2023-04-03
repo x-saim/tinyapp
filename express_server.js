@@ -1,5 +1,7 @@
 const express = require("express");
+const cookieParser = require('cookie-parser')
 const app = express();
+app.use(cookieParser())
 const PORT = 8080; // default port 8080
 
 /*
@@ -29,13 +31,27 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//LOGIN Route Post
+app.post("/login",(req,res) => {
+  res.cookie("username",req.body.username);
+  res.redirect("/urls");
+});
+
 app.get("/urls", (req,res) => {
-  const templateVars = {urls: urlDatabase}; //passing an object
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase,
+  };
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
+
+
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("urls_new",templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -50,9 +66,14 @@ app.post("/urls", (req, res) => {
 }
 );
 
+
+
 //separate urls for each short url id
 app.get("/urls/:id", (req,res) => {
-  const templateVars = {id: req.params.id, longURL: urlDatabase[req.params.id]};
+  const templateVars = {
+    id: req.params.id, 
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]};
   res.render("urls_show",templateVars);
 });
 
@@ -81,12 +102,6 @@ app.post("/urls/:id/delete",(req,res) => {
   res.redirect("/urls");
 });
 
-//LOGIN Route Post
-app.post("/login",(req,res) => {
-  console.log(req.body);
-  res.cookie("username",req.body);
-  res.redirect("/urls");
-});
 
 // create new route containing json string of urlDatabase obj
 app.get("/urls.json", (req,res) => {
