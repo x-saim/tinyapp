@@ -31,18 +31,18 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//LOGIN Route Post
+app.post("/login",(req,res) => {
+  res.cookie("username",req.body.username);
+  res.redirect("/urls");
+});
+
 app.get("/urls", (req,res) => {
   const templateVars = {
     username: req.cookies["username"],
     urls: urlDatabase,
   };
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
-});
-
-//LOGIN Route Post
-app.post("/login",(req,res) => {
-  res.cookie("username",req.body.username);
-  res.redirect("/urls");
 });
 
 app.get("/urls/new", (req, res) => {
