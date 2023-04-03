@@ -81,6 +81,13 @@ app.post("/urls/:id/delete",(req,res) => {
   res.redirect("/urls");
 });
 
+//LOGIN Route Post
+app.post("/login",(req,res) => {
+  console.log(req.body);
+  res.cookie("username",req.body);
+  res.redirect("/urls");
+});
+
 // create new route containing json string of urlDatabase obj
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
