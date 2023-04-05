@@ -1,7 +1,7 @@
 const express = require("express");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 const app = express();
-app.use(cookieParser())
+app.use(cookieParser());
 const PORT = 8080; // default port 8080
 
 /*
@@ -25,6 +25,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 app.use(express.urlencoded({ extended: true })); //express middleware
 
 app.get("/", (req, res) => {
@@ -34,7 +47,11 @@ app.get("/", (req, res) => {
 //rendering register page
 app.get("/register",(req,res)=> {
   res.render("login");
-})
+});
+
+app.post("/register",(req,res) => {
+
+});
 
 app.get("/urls", (req,res) => {
   const templateVars = {
@@ -54,7 +71,7 @@ app.post("/login",(req,res) => {
 app.post("/logout",(req,res) => {
   res.clearCookie("username");
   res.redirect("/urls");
-})
+});
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
@@ -78,7 +95,7 @@ app.post("/urls", (req, res) => {
 //separate urls for each short url id
 app.get("/urls/:id", (req,res) => {
   const templateVars = {
-    id: req.params.id, 
+    id: req.params.id,
     longURL: urlDatabase[req.params.id],
     username: req.cookies["username"]};
   res.render("urls_show",templateVars);
