@@ -62,7 +62,7 @@ app.get("/", (req, res) => {
 
 //rendering register page
 app.get("/register",(req,res)=> {
-  res.render("login");
+  res.render("urls_register");
 });
 
 //assigns new user id to user upon registeration, appends to users object.
@@ -107,6 +107,10 @@ app.get("/urls", (req,res) => {
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
+
+app.get("/login", (req,res) => {
+  res.render("urls_login");
+})
 //LOGIN Route Post
 app.post("/login",(req,res) => {
   //res.cookie("username",req.body.username);
