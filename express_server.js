@@ -31,6 +31,10 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//rendering register page
+app.get("/register",(req,res)=> {
+  res.render("dashboard");
+})
 
 app.get("/urls", (req,res) => {
   const templateVars = {
