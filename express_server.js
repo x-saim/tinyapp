@@ -49,42 +49,49 @@ app.get("/register",(req,res)=> {
   res.render("login");
 });
 
+//assigns new user id to user upon registeration, appends to users object.
 app.post("/register",(req,res) => {
   const generateID = generateRandomString();
-  console.log(users);
+  //Add new user object to global users object
   users[generateID] = {
     "id": generateID,
     "email":  req.body.email, 
     "password": req.body.password
   }
-  res.cookie("user_id",users[generateID]["id"])
+  
+  const userID = users[generateID];
+
+  //Set userid cookie
+  res.cookie("user_id",userID)
   console.log(users);
+  //Redirect user to /urls page
   res.redirect("/urls");
 });
 
 app.get("/urls", (req,res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: req.cookies["user_id"],
     urls: urlDatabase,
   };
+  //console.log(templateVars);
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
 //LOGIN Route Post
 app.post("/login",(req,res) => {
-  res.cookie("username",req.body.username);
+  //res.cookie("username",req.body.username);
   res.redirect("/urls");
 });
 
 //LOGOUT Route POST
 app.post("/logout",(req,res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    user: req.cookies["user_id"]
   };
   res.render("urls_new",templateVars);
 });
@@ -106,7 +113,8 @@ app.get("/urls/:id", (req,res) => {
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]};
+    user: req.cookies["user_id"]
+  }
   res.render("urls_show",templateVars);
 });
 
