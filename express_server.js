@@ -38,6 +38,9 @@ const users = {
   },
 };
 
+// helper function
+
+
 app.use(express.urlencoded({ extended: true })); //express middleware
 
 app.get("/", (req, res) => {
@@ -51,19 +54,34 @@ app.get("/register",(req,res)=> {
 
 //assigns new user id to user upon registeration, appends to users object.
 app.post("/register",(req,res) => {
+   
+  // check if email and password are empty strings.
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send("Invalid credentials");
+  } else if (req.body.email) {      //check if email has been used before.
+    for (const userId in users) {
+      if (users[userId]["email"] === req.body.email) {
+        return res.status(400).send("Email already used");
+      }
+    }
+
+    return null;
+  }
+
   const generateID = generateRandomString();
+  
   //Add new user object to global users object
   users[generateID] = {
     "id": generateID,
-    "email":  req.body.email, 
-    "password": req.body.password
+    "email":  req.body.email.trim(), 
+    "password": req.body.password.trim()
   }
-  
   const userID = users[generateID];
+  
 
   //Set userid cookie
   res.cookie("user_id",userID)
-  console.log(users);
+
   //Redirect user to /urls page
   res.redirect("/urls");
 });
