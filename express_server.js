@@ -71,8 +71,6 @@ app.post("/urls", (req, res) => {
 }
 );
 
-
-
 //separate urls for each short url id
 app.get("/urls/:id", (req,res) => {
   const templateVars = {
