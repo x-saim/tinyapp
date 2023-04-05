@@ -56,13 +56,13 @@ const users = {
 
 app.use(express.urlencoded({ extended: true })); //express middleware
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
 //rendering register page
 app.get("/register",(req,res)=> {
-  res.render("urls_register");
+  const templateVars = {
+    user: req.cookies["user_id"],
+    urls: urlDatabase,
+  };
+  res.render("urls_register",templateVars);
 });
 
 //assigns new user id to user upon registeration, appends to users object.
@@ -109,7 +109,11 @@ app.get("/urls", (req,res) => {
 
 
 app.get("/login", (req,res) => {
-  res.render("urls_login");
+  const templateVars = {
+    user: req.cookies["user_id"],
+    urls: urlDatabase,
+  };
+  res.render("urls_login",templateVars);
 })
 //LOGIN Route Post
 app.post("/login",(req,res) => {

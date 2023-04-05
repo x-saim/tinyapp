@@ -16,18 +16,16 @@ crossorigin="anonymous"
 </head>
 
 <body>
-
-  <h4>Registration</h4>
-  <br>
+  <%- include('partials/_header') %>
+  <h3>Create Account</h3>
   <form method="POST" action="/register">
-    <label>Email:</label>
+    <label><b>Email address:</b></label>
     <div>
       <input 
       name="email" 
       type="email" 
       placeholder="Email" />
     </div>
-    <br>
     <label>Password:</label>
     <div>
       <input 
