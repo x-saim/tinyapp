@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
 
 //rendering register page
 app.get("/register",(req,res)=> {
-  res.render("dashboard");
+  res.render("login");
 })
 
 app.get("/urls", (req,res) => {
