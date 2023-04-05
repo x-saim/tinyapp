@@ -16,6 +16,19 @@ const generateRandomString = () => {
   return result;
 };
 
+/*
+Function checks if someone tries to register with an email that already exists in users object.
+*/
+const getUserByEmail = (email) => {
+  for (const userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      return user;
+    }
+  }
+
+  return null;
+};
 
 //set ejs as the view engine.
 app.set("view engine","ejs");
@@ -56,16 +69,15 @@ app.get("/register",(req,res)=> {
 app.post("/register",(req,res) => {
    
   // check if email and password are empty strings.
-  if (!req.body.email || !req.body.password) {
-    return res.status(400).send("Invalid credentials");
-  } else if (req.body.email) {      //check if email has been used before.
-    for (const userId in users) {
-      if (users[userId]["email"] === req.body.email) {
-        return res.status(400).send("Email already used");
-      }
-    }
+  const email = req.body.email.trim();
+  const password = req.body.password.trim();
 
-    return null;
+  if (!email || !password) {
+    return res.status(400).send("Invalid credentials");
+
+    //check if email has been used before.
+  } else if (getUserByEmail(email)) {     
+    return res.status(400).send("Email already in use.");
   }
 
   const generateID = generateRandomString();
