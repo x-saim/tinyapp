@@ -50,7 +50,16 @@ app.get("/register",(req,res)=> {
 });
 
 app.post("/register",(req,res) => {
-
+  const generateID = generateRandomString();
+  console.log(users);
+  users[generateID] = {
+    "id": generateID,
+    "email":  req.body.email, 
+    "password": req.body.password
+  }
+  res.cookie("user_id",users[generateID]["id"])
+  console.log(users);
+  res.redirect("/urls");
 });
 
 app.get("/urls", (req,res) => {
