@@ -44,17 +44,28 @@ Function checks if inputted password exists in the database for valid user.
 const passExistCheck = (password) => {
   for (const userId in users) {
     const user = users[userId];
-    if(user.password === password) {
+    if (user.password === password) {
       return user;
     }
   }
   return null;
-}
+};
 
+
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
@@ -79,7 +90,7 @@ app.get("/register",(req,res)=> {
     urls: urlDatabase,
   };
 
-  if(!templateVars.user) {
+  if (!templateVars.user) {
     res.render("urls_register",templateVars);
   }
   res.redirect("/urls");
@@ -88,7 +99,7 @@ app.get("/register",(req,res)=> {
 //REGISTER Route POST
 app.post("/register",(req,res) => {
   
-  if(req.cookies["urls_id"]) {
+  if (req.cookies["urls_id"]) {
     res.redirect("/urls");
   }
 
@@ -136,8 +147,8 @@ app.get("/login", (req,res) => {
     urls: urlDatabase,
   };
 
-  if(!templateVars.user) {
-   return res.render("urls_login",templateVars);
+  if (!templateVars.user) {
+    return res.render("urls_login",templateVars);
   }
 
   res.redirect("/urls");
@@ -158,7 +169,7 @@ app.post("/login",(req,res) => {
     return res.status(403).send("Incorrect password. Please try again.");
   }
 
-  const user = getUserByEmail(email); 
+  const user = getUserByEmail(email);
   res.cookie("user_id",user);
   res.redirect("/urls");
 });
@@ -183,31 +194,37 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   //edge case: if user inputs url without http/https protocol
-  if(!req.cookies["urls_id"]) {
-    res.send("Access denied. You must be logged in to shortern URLs.\n")
-  } else {
-    let longURL = req.body["longURL"];
-    if (!longURL.includes("http://") && !longURL.includes("https://")) {
-      longURL = "https://" + longURL;
-    }
-    const id = generateRandomString();
-    urlDatabase[id] = longURL;
-    res.redirect(`/urls/${id}`); // redirect the client to the /urls/:id route for the newly created short URL
+  if (!req.cookies["user_id"]) {
+    return res.send("Access denied. You must be logged in to shortern URLs.\n");
   }
 
-}
-);
+  let longURLBody = req.body["longURL"];
+  if (!longURLBody.includes("http://") && !longURLBody.includes("https://")) {
+    longURLBody = "https://" + longURLBody;
+  }
+  const urlID = generateRandomString();
+  const userID = generateRandomString();
+
+  urlDatabase[urlID] = {
+    longURL: longURLBody,
+    userID
+  }
+
+  res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
+});
 
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
 
-  if(!urlDatabase[req.params.id]) {
-    return res.status(400).send("Shortened URL does not exist!\n");
-  }
+  console.log(req.params)
+  // if (!urlDatabase[req.params]) {
+  //   return res.status(400).send("Shortened URL does not exist!\n");
+  // }
 
   const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    id: req.params,
+    longURL: urlDatabase[req.params][longURL],
+    urls: urlDatabase,
     user: req.cookies["user_id"]
   };
 
@@ -216,8 +233,9 @@ app.get("/urls/:id", (req,res) => {
 
 //redirect short urls to long urls
 app.get("/u/:id", (req,res) => {
-  const longURL = urlDatabase[req.params.id];
-  res.redirect(longURL);
+  const id = req.params.id;
+  const loadLongURL = urlDatabase[id]["longURL"];
+  res.redirect(loadLongURL);
 });
 
 //a POST route that updates a URL resource
