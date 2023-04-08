@@ -7,7 +7,13 @@ const morgan = require('morgan');
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
 //app.use(cookieParser());
-app.use(cookieSession)
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1','key2']
+}));
+
+
 
 
 const PORT = 8080;
@@ -85,12 +91,12 @@ const users = {
 //REGISTER Route GET
 app.get("/register",(req,res)=> {
   const templateVars = {
-    user: req.cookies["user_id"],
+    user: req.session.user_id,
     urls: urlDatabase,
   };
 
   if (!templateVars.user) {
-    res.render("urls_register",templateVars);
+    return res.render("urls_register",templateVars);
   }
   res.redirect("/urls");
 });
@@ -98,7 +104,7 @@ app.get("/register",(req,res)=> {
 //LOGIN Route GET
 app.get("/login", (req,res) => {
   const templateVars = {
-    user: req.cookies["user_id"],
+    user: req.session.user_id,
     urls: urlDatabase,
   };
 
@@ -110,15 +116,15 @@ app.get("/login", (req,res) => {
 });
 
 app.get("/urls", (req,res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
   }
 
-  const loggedID = req.cookies["user_id"]["id"];
+  const loggedID = req.session.user_id["id"];
   const filterUser = urlsForUser(loggedID);
 
   const templateVars = {
-    user: req.cookies["user_id"],
+    user: req.session.user_id,
     urls: filterUser,
   };
 
@@ -126,12 +132,12 @@ app.get("/urls", (req,res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.redirect("/login");
   }
   
   const templateVars = {
-    user: req.cookies["user_id"]
+    user: req.session.user_id
   };
 
   res.render("urls_new",templateVars);
@@ -140,9 +146,9 @@ app.get("/urls/new", (req, res) => {
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
   const id = req.params.id;
-  const filterUser = urlsForUser(req.cookies["user_id"]["id"]);
+  const filterUser = urlsForUser(req.session.user_id["id"]);
 
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
   }
 
@@ -156,7 +162,7 @@ app.get("/urls/:id", (req,res) => {
   const templateVars = {
     id,
     longURL: urlDatabase[id]["longURL"],
-    user: req.cookies["user_id"]
+    user: req.session.user_id
   };
 
   res.render("urls_show",templateVars);
@@ -177,7 +183,7 @@ app.get("/urls.json", (req,res) => {
 //REGISTER Route POST
 app.post("/register",(req,res) => {
   
-  if (req.cookies["user_id"]) {
+  if (req.session.user_id) {
     res.redirect("/urls");
   }
 
@@ -204,7 +210,8 @@ app.post("/register",(req,res) => {
   };
   
   const user = users[generateID];
-  res.cookie("user_id", user);
+  req.session.user_id = user;
+  //res.cookie("user_id", user);
   res.redirect("/urls");
 });
 
@@ -222,19 +229,21 @@ app.post("/login",(req,res) => {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Invalid email or password.`);
   }
 
-  res.cookie("user_id",user);
+  req.session.user_id = user;
+  //res.cookie("user_id",user);
   res.redirect("/urls");
 });
 
 //LOGOUT Route POST
 app.post("/logout",(req,res) => {
-  res.clearCookie("user_id");
+  req.session = null;
+  //res.clearCookie("user_id");
   res.redirect("/login");
 });
 
 
 app.post("/urls", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To create new shortened urls, please log in or register to get started.\n`);
   }
   let longURLBody = req.body["longURL"];
@@ -246,9 +255,8 @@ app.post("/urls", (req, res) => {
   
   urlDatabase[urlID] = {
     longURL: longURLBody,
-    userID: req.cookies["user_id"]["id"]
+    userID: req.session.user_id["id"]
   };
-  console.log(urlDatabase);
 
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
@@ -256,7 +264,7 @@ app.post("/urls", (req, res) => {
 
 //EDIT --- POST route UPDATE a URL resource.
 app.post("/urls/:id", (req, res) => {
-  const user = req.cookies["user_id"];
+  const user = req.session.user_id;
   const urlID = req.params.id;
   const url = urlDatabase[urlID];
 
@@ -280,7 +288,7 @@ app.post("/urls/:id", (req, res) => {
 //DELETE --- POST route that DELETES a URL resource.
 app.post("/urls/:id/delete",(req,res) => {
   const urlID = req.params.id;
-  const user = req.cookies["user_id"];
+  const user = req.session.user_id;
 
   if (!user) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
