@@ -78,7 +78,11 @@ app.get("/register",(req,res)=> {
     user: req.cookies["user_id"],
     urls: urlDatabase,
   };
-  res.render("urls_register",templateVars);
+
+  if(!templateVars.user) {
+    res.render("urls_register",templateVars);
+  }
+  res.redirect("/urls");
 });
 
 //REGISTER Route POST
@@ -136,7 +140,7 @@ app.get("/login", (req,res) => {
   if(!templateVars.user) {
     res.render("urls_login",templateVars);
   }
-  
+
   res.redirect("/urls");
 });
 
