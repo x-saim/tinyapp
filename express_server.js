@@ -1,8 +1,16 @@
+// ------------------ REQUIREMENTS
 const express = require("express");
 const cookieParser = require('cookie-parser');
+
+// ------------------ SETUP / MIDDLEWARE
 const app = express();
 app.use(cookieParser());
-const PORT = 8080; // default port 8080
+const PORT = 8080;
+
+//sets the template engine as html with embbedded js (views/*.ejs)
+app.set("view engine","ejs");
+
+app.use(express.urlencoded({ extended: true })); //express middleware
 
 /*
 Function creates a string of random characters from a alphanumeric character string.
@@ -30,8 +38,19 @@ const getUserByEmail = (email) => {
   return null;
 };
 
-//set ejs as the view engine.
-app.set("view engine","ejs");
+/*
+Function checks if inputted password exists in the database for valid user.
+*/
+const passExistCheck = (password) => {
+  for (const userId in users) {
+    const user = users[userId];
+    if(user.password === password) {
+      return user;
+    }
+  }
+  return null;
+}
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -44,17 +63,14 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
-  user2RandomID: {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk",
+  test: {
+    id: "test",
+    email: "test@test.com",
+    password: "123",
   },
 };
 
-// helper function
-
-
-app.use(express.urlencoded({ extended: true })); //express middleware
+// ------------------ ROUTES/ENDPOINTS
 
 //rendering register page
 app.get("/register",(req,res)=> {
@@ -76,7 +92,7 @@ app.post("/register",(req,res) => {
     return res.status(400).send("Invalid credentials");
 
     //check if email has been used before.
-  } else if (getUserByEmail(email)) {     
+  } else if (getUserByEmail(email)) {
     return res.status(400).send("Email already in use.");
   }
 
@@ -85,14 +101,14 @@ app.post("/register",(req,res) => {
   //Add new user object to global users object
   users[generateID] = {
     "id": generateID,
-    "email":  req.body.email.trim(), 
+    "email":  req.body.email.trim(),
     "password": req.body.password.trim()
-  }
+  };
   const userID = users[generateID];
   
 
   //Set userid cookie
-  res.cookie("user_id",userID)
+  res.cookie("user_id",userID);
 
   //Redirect user to /urls page
   res.redirect("/urls");
@@ -114,10 +130,25 @@ app.get("/login", (req,res) => {
     urls: urlDatabase,
   };
   res.render("urls_login",templateVars);
-})
+});
+
 //LOGIN Route Post
 app.post("/login",(req,res) => {
-  //res.cookie("username",req.body.username);
+  const {email, password} = req.body;
+
+  //checks if email and password inputs are empty strings.
+  if (!email || !password) {
+    return res.status(400).send('Invalid credentials');
+    //If a user with that e-mail cannot be found, return a response with a 403 status code.
+  } else if (!getUserByEmail(email)) {
+    return res.status(403).send("User does not exist.");
+    
+  } else if (!passExistCheck(password)) {
+    return res.status(403).send("Incorrect password. Please try again.");
+  }
+
+  const user = getUserByEmail(email);  
+  res.cookie("url_id",user.id);
   res.redirect("/urls");
 });
 
@@ -152,7 +183,7 @@ app.get("/urls/:id", (req,res) => {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
     user: req.cookies["user_id"]
-  }
+  };
   res.render("urls_show",templateVars);
 });
 
