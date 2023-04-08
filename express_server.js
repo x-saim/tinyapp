@@ -38,25 +38,6 @@ const getUserByEmail = (email) => {
   return null;
 };
 
-/*
-Function checks if inputted password exists in the database for valid user.
-*/
-const passExistCheck = (password) => {
-  for (const userId in users) {
-    const user = users[userId];
-    if (user.password === password) {
-      return user;
-    }
-  }
-  return null;
-};
-
-
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// };
-
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -165,11 +146,12 @@ app.post("/login",(req,res) => {
   } else if (!getUserByEmail(email)) {
     return res.status(403).send("User does not exist.");
     
-  } else if (!passExistCheck(password)) {
+  } else if (getUserByEmail(email).password !== password) {
     return res.status(403).send("Incorrect password. Please try again.");
   }
 
   const user = getUserByEmail(email);
+
   res.cookie("user_id",user);
   res.redirect("/urls");
 });
@@ -216,6 +198,7 @@ app.post("/urls", (req, res) => {
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
   const id = req.params.id;
+
   if (!urlDatabase[id]) {
     return res.status(400).send("Shortened URL does not exist!\n");
   }
@@ -236,10 +219,9 @@ app.get("/u/:id", (req,res) => {
   res.redirect(loadLongURL);
 });
 
-//a POST route that updates a URL resource
+//POST route UPDATE a URL resource
 app.post("/urls/:id", (req, res) => {
-  const id = req.params.id; //assignign ID from URL /urls/<%= id %> to var id.
-  console.log(req.body);
+  const id = req.params.id;
   let updatedLongURL = req.body.longURL;
   
   //edge case: if user inputs url without http/https protocol
