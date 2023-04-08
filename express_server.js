@@ -42,16 +42,19 @@ const urlsForUser = (id) => {
   let filterUser = {};
 
   for (const urlID in urlDatabase) {
-    console.log(urlID);
     if (urlDatabase[urlID].userID === id) {
-      filterUser[urlID] = urlDatabase[urlID].longURL;
+      filterUser[urlID] = urlDatabase[urlID];
     }
   }
   
   return filterUser;
 };
-  
-    
+
+const logStatusCheck = (cookie) => {
+  if (!cookie) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
+  }
+};
 
 const urlDatabase = {
   b6UTxQ: {
@@ -128,22 +131,18 @@ app.post("/register",(req,res) => {
 });
 
 app.get("/urls", (req,res) => {
+  if (!req.cookies["user_id"]) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
+  }
 
-  // console.log(urlDatabase);
-  // console.log(users);
   const loggedID = req.cookies["user_id"]["id"];
-  console.log(loggedID);
-  console.log(urlsForUser(loggedID));
-  //console.log(filterUser);
+  const filterUser = urlsForUser(loggedID);
 
   const templateVars = {
     user: req.cookies["user_id"],
-    urls: urlDatabase,
+    urls: filterUser,
   };
 
-  if (!templateVars.user) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
-  }
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
@@ -223,10 +222,14 @@ app.post("/urls", (req, res) => {
 
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
+  if (!req.cookies["user_id"]) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
+  }
+
   const id = req.params.id;
 
   if (!urlDatabase[id]) {
-    return res.status(400).send("Shortened URL does not exist!\n");
+    return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
   }
 
   const templateVars = {
