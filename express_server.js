@@ -83,7 +83,11 @@ app.get("/register",(req,res)=> {
 
 //REGISTER Route POST
 app.post("/register",(req,res) => {
-   
+  
+  if(req.cookies["urls_id"]) {
+    res.redirect("/urls");
+  }
+
   // check if email and password are empty strings.
   const email = req.body.email.trim();
   const password = req.body.password.trim();
@@ -96,6 +100,7 @@ app.post("/register",(req,res) => {
     return res.status(400).send("Email already in use.");
   }
 
+
   const generateID = generateRandomString();
   
   //Add new user object to global users object
@@ -104,12 +109,11 @@ app.post("/register",(req,res) => {
     "email":  req.body.email.trim(),
     "password": req.body.password.trim()
   };
-  const userID = users[generateID];
-  
+
+  const userID = users[generateID]["id"];
 
   //Set userid cookie
   res.cookie("user_id",userID);
-
   //Redirect user to /urls page
   res.redirect("/urls");
 });
@@ -119,6 +123,7 @@ app.get("/urls", (req,res) => {
     user: req.cookies["user_id"],
     urls: urlDatabase,
   };
+
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
