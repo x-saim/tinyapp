@@ -215,16 +215,14 @@ app.post("/urls", (req, res) => {
 
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
-
-  console.log(req.params)
-  // if (!urlDatabase[req.params]) {
-  //   return res.status(400).send("Shortened URL does not exist!\n");
-  // }
+  const id = req.params.id;
+  if (!urlDatabase[id]) {
+    return res.status(400).send("Shortened URL does not exist!\n");
+  }
 
   const templateVars = {
-    id: req.params,
-    longURL: urlDatabase[req.params][longURL],
-    urls: urlDatabase,
+    id,
+    longURL: urlDatabase[id]["longURL"],
     user: req.cookies["user_id"]
   };
 
@@ -241,13 +239,14 @@ app.get("/u/:id", (req,res) => {
 //a POST route that updates a URL resource
 app.post("/urls/:id", (req, res) => {
   const id = req.params.id; //assignign ID from URL /urls/<%= id %> to var id.
+  console.log(req.body);
   let updatedLongURL = req.body.longURL;
   
   //edge case: if user inputs url without http/https protocol
   if (!updatedLongURL.includes("http://") && !updatedLongURL.includes("https://")) {
     updatedLongURL = "https://" + updatedLongURL;
   }
-  urlDatabase[id] = updatedLongURL;
+  urlDatabase[id]["longURL"] = updatedLongURL;
   res.redirect("/urls");
 });
 
