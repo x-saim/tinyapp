@@ -50,11 +50,6 @@ const urlsForUser = (id) => {
   return filterUser;
 };
 
-const logStatusCheck = (cookie) => {
-  if (!cookie) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
-  }
-};
 
 const urlDatabase = {
   b6UTxQ: {
@@ -95,6 +90,87 @@ app.get("/register",(req,res)=> {
   res.redirect("/urls");
 });
 
+//LOGIN Route GET
+app.get("/login", (req,res) => {
+  const templateVars = {
+    user: req.cookies["user_id"],
+    urls: urlDatabase,
+  };
+
+  if (!templateVars.user) {
+    return res.render("urls_login",templateVars);
+  }
+
+  res.redirect("/urls");
+});
+
+app.get("/urls", (req,res) => {
+  if (!req.cookies["user_id"]) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
+  }
+
+  const loggedID = req.cookies["user_id"]["id"];
+  const filterUser = urlsForUser(loggedID);
+  console.log(filterUser);
+
+  const templateVars = {
+    user: req.cookies["user_id"],
+    urls: filterUser,
+  };
+
+  res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
+});
+
+app.get("/urls/new", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    return res.redirect("/login");
+  }
+  
+  const templateVars = {
+    user: req.cookies["user_id"]
+  };
+
+  res.render("urls_new",templateVars);
+});
+
+//separate urls route for each short url id
+app.get("/urls/:id", (req,res) => {
+  if (!req.cookies["user_id"]) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
+  }
+
+  const id = req.params.id;
+  const filterUser = urlsForUser(req.cookies["user_id"]["id"]);
+
+  if (!urlDatabase[id]) {
+    return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
+  }
+  
+  console.log(filterUser);
+  if (!filterUser[id]) {
+    return res.status(403).send("Error: You do not have the rights to access this page.");
+  }
+  const templateVars = {
+    id,
+    longURL: urlDatabase[id]["longURL"],
+    user: req.cookies["user_id"]
+  };
+
+  res.render("urls_show",templateVars);
+});
+
+//redirect short urls to long urls
+app.get("/u/:id", (req,res) => {
+  const id = req.params.id;
+  const loadLongURL = urlDatabase[id]["longURL"];
+  res.redirect(loadLongURL);
+});
+
+// create new route containing json string of urlDatabase obj
+app.get("/urls.json", (req,res) => {
+  res.json(urlDatabase);
+});
+
 //REGISTER Route POST
 app.post("/register",(req,res) => {
   
@@ -130,36 +206,6 @@ app.post("/register",(req,res) => {
   res.redirect("/urls");
 });
 
-app.get("/urls", (req,res) => {
-  if (!req.cookies["user_id"]) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
-  }
-
-  const loggedID = req.cookies["user_id"]["id"];
-  const filterUser = urlsForUser(loggedID);
-
-  const templateVars = {
-    user: req.cookies["user_id"],
-    urls: filterUser,
-  };
-
-  res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
-});
-
-//LOGIN Route GET
-app.get("/login", (req,res) => {
-  const templateVars = {
-    user: req.cookies["user_id"],
-    urls: urlDatabase,
-  };
-
-  if (!templateVars.user) {
-    return res.render("urls_login",templateVars);
-  }
-
-  res.redirect("/urls");
-});
-
 //LOGIN Route Post
 app.post("/login",(req,res) => {
   const {email, password} = req.body;
@@ -187,73 +233,25 @@ app.post("/logout",(req,res) => {
   res.redirect("/login");
 });
 
-app.get("/urls/new", (req, res) => {
-  if (!req.cookies["user_id"]) {
-    return res.redirect("/login");
-  }
-  
-  const templateVars = {
-    user: req.cookies["user_id"]
-  };
-
-  res.render("urls_new",templateVars);
-});
 
 app.post("/urls", (req, res) => {
-  //edge case: if user inputs url without http/https protocol
-  const id = req.cookies["user_id"]
-  if (!id) {
-    return res.send("Access denied. You must be logged in to shortern URLs.\n");
-  }
 
   let longURLBody = req.body["longURL"];
   if (!longURLBody.includes("http://") && !longURLBody.includes("https://")) {
     longURLBody = "https://" + longURLBody;
   }
-  const urlID = generateRandomString();
-  const userID = generateRandomString();
 
+  const urlID = generateRandomString();
+  
   urlDatabase[urlID] = {
     longURL: longURLBody,
-    userID: id["id"]
+    userID: req.cookies["user_id"]["id"]
   };
   console.log(urlDatabase);
-  
+
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
 
-//separate urls route for each short url id
-app.get("/urls/:id", (req,res) => {
-  if (!req.cookies["user_id"]) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
-  }
-
-  const id = req.params.id;
-
-  if (!urlDatabase[id]) {
-    return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
-  }
-  
-  const filterUser = urlsForUser(req.cookies["user_id"]["id"]);
-
-  if(!filterUser[id]) {
-    return res.status(403).send("Error: You do not have the rights to access this page.");
-  }
-  const templateVars = {
-    id,
-    longURL: urlDatabase[id]["longURL"],
-    user: req.cookies["user_id"]
-  };
-
-  res.render("urls_show",templateVars);
-});
-
-//redirect short urls to long urls
-app.get("/u/:id", (req,res) => {
-  const id = req.params.id;
-  const loadLongURL = urlDatabase[id]["longURL"];
-  res.redirect(loadLongURL);
-});
 
 //POST route UPDATE a URL resource
 app.post("/urls/:id", (req, res) => {
@@ -274,11 +272,6 @@ app.post("/urls/:id/delete",(req,res) => {
   res.redirect("/urls");
 });
 
-
-// create new route containing json string of urlDatabase obj
-app.get("/urls.json", (req,res) => {
-  res.json(urlDatabase);
-});
 
 // Catch all route
 app.use((req, res) => {
