@@ -207,20 +207,16 @@ app.post("/register",(req,res) => {
 //LOGIN Route Post
 app.post("/login",(req,res) => {
   const {email, password} = req.body;
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  const user = getUserByEmail(email);
 
   //checks if email and password inputs are empty strings.
   if (!email || !password) {
-    return res.status(400).send('Invalid credentials');
-  //If a user with that e-mail cannot be found, return a response with a 403 status code.
-  } else if (!getUserByEmail(email)) {
-    return res.status(403).send("User does not exist.");
-    
-  } else if (!bcrypt.compareSync(getUserByEmail(email).password, hashedPassword)) {
-    return res.status(403).send("Incorrect password. Please try again.");
+    return res.status(400).send('Invalid credentials.');
+    //If a user with that e-mail cannot be found, return a response with a 403 status code.
+
+  } else if (!user || !bcrypt.compareSync(password, user.hashPassword)) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Invalid email or password.`);
   }
-  //console.log(users);
-  const user = getUserByEmail(email);
 
   res.cookie("user_id",user);
   res.redirect("/urls");
