@@ -134,12 +134,12 @@ app.get("/urls/new", (req, res) => {
 
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
+  const id = req.params.id;
+  const filterUser = urlsForUser(req.cookies["user_id"]["id"]);
+
   if (!req.cookies["user_id"]) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
   }
-
-  const id = req.params.id;
-  const filterUser = urlsForUser(req.cookies["user_id"]["id"]);
 
   if (!urlDatabase[id]) {
     return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
@@ -172,7 +172,7 @@ app.get("/urls.json", (req,res) => {
 //REGISTER Route POST
 app.post("/register",(req,res) => {
   
-  if (req.cookies["urls_id"]) {
+  if (req.cookies["user_id"]) {
     res.redirect("/urls");
   }
 
@@ -255,43 +255,45 @@ app.post("/urls", (req, res) => {
 
 //EDIT --- POST route UPDATE a URL resource.
 app.post("/urls/:id", (req, res) => {
-  const userID = req.cookies["user_id"]["id"];
+  const user = req.cookies["user_id"];
   const urlID = req.params.id;
   const url = urlDatabase[urlID];
 
-  if (!userID) {
+  if (!user) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
+  } else if (!url) {
+    return res.status(404).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Page does not exist.\n`);
+  } else if (url["userID"] !== user.id) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to update this URL.\n`);
+  } else {
+    let updatedLongURL = req.body.longURL;
+    //edge case: if user inputs url without http/https protocol
+    if (!updatedLongURL.includes("http://") && !updatedLongURL.includes("https://")) {
+      updatedLongURL = "https://" + updatedLongURL;
+    }
+    url["longURL"] = updatedLongURL;
+    res.redirect("/urls");
   }
-  
-  let updatedLongURL = req.body.longURL;
-  //edge case: if user inputs url without http/https protocol
-  if (!updatedLongURL.includes("http://") && !updatedLongURL.includes("https://")) {
-    updatedLongURL = "https://" + updatedLongURL;
-  }
-
-  url["longURL"] = updatedLongURL;
-  res.redirect("/urls");
 });
 
 //DELETE --- POST route that DELETES a URL resource.
 app.post("/urls/:id/delete",(req,res) => {
-  const userID = req.cookies["user_id"]["id"];
   const urlID = req.params.id;
-  const url = urlDatabase[urlID];
+  const user = req.cookies["user_id"];
 
-  if (!userID) {
+  if (!user) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
-  }
+  } else if (!urlDatabase[urlID]) {
+    return res.status(404).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Page does not exist.\n`);
 
-  if (url["userID"] !== userID) {
+  } else if (urlDatabase[urlID]["userID"] !== user["id"]) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to delete this URL.\n`);
+  } else {
+    delete urlDatabase[urlID];
+    console.log("Successfully deleted URL.");
+    res.redirect("/urls");
   }
-
-  delete urlDatabase[urlID];
-
-  res.redirect("/urls");
 });
-
 
 // Catch all route
 app.use((req, res) => {
