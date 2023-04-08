@@ -1,12 +1,13 @@
 // ------------------ REQUIREMENTS
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const cookieParser = require('cookie-parser');
-
+const morgan = require('morgan');
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
 app.use(cookieParser());
 const PORT = 8080;
-
+app.use(morgan('dev'));
 //sets the template engine as html with embbedded js (views/*.ejs)
 app.set("view engine","ejs");
 
@@ -189,18 +190,18 @@ app.post("/register",(req,res) => {
   }
 
   const generateID = generateRandomString();
-  
+  const hashedPassword = bcrypt.hashSync(password,10);
+
   //Add new user object to global users object
   users[generateID] = {
     "id": generateID,
     "email":  req.body.email.trim(),
-    "password": req.body.password.trim()
+    "password": hashedPassword
   };
 
+  
   const user = users[generateID];
-  //Set userid cookie
   res.cookie("user_id", user);
-  //Redirect user to /urls page
   res.redirect("/urls");
 });
 
