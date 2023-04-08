@@ -1,11 +1,15 @@
 // ------------------ REQUIREMENTS
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const morgan = require('morgan');
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
-app.use(cookieParser());
+//app.use(cookieParser());
+app.use(cookieSession)
+
+
 const PORT = 8080;
 app.use(morgan('dev'));
 //sets the template engine as html with embbedded js (views/*.ejs)
