@@ -17,6 +17,22 @@ const getUserByEmail = (email,database) => {
   return undefined;
 };
 
+/**
+ * Returns a randomly generated string with a length of six characters.
+ *
+ * @returns {string} A randomly generated string with a length of six characters.
+ */
+
+const generateRandomString = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; //62 characters
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+};
+
+
 module.exports = {
   getUserByEmail
 };

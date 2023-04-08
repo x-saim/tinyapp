@@ -3,7 +3,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
-const {getUserByEmail} = require("./helpers");
+const {getUserByEmail,generateRandomString} = require("./helpers");
 
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
@@ -13,27 +13,12 @@ app.use(cookieSession({
   keys: ['key1','key2']
 }));
 
-
 const PORT = 8080;
 app.use(morgan('dev'));
 //sets the template engine as html with embbedded js (views/*.ejs)
 app.set("view engine","ejs");
 
 app.use(express.urlencoded({ extended: true })); //express middleware
-
-/*
-Function creates a string of random characters from a alphanumeric character string.
-*/
-const generateRandomString = () => {
-  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'; //62 characters
-  let result = '';
-  for (let i = 0; i < 6; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-};
-
-
 
 const urlsForUser = (id) => {
   let filterUser = {};
@@ -46,7 +31,6 @@ const urlsForUser = (id) => {
   
   return filterUser;
 };
-
 
 const urlDatabase = {
   b6UTxQ: {
@@ -73,6 +57,10 @@ const users = {
 };
 
 // ------------------ ROUTES/ENDPOINTS
+
+app.get("/", (req,res) => {
+  res.redirect("/urls");
+});
 
 //REGISTER Route GET
 app.get("/register",(req,res)=> {
@@ -103,7 +91,7 @@ app.get("/login", (req,res) => {
 
 app.get("/urls", (req,res) => {
   if (!req.session.user_id) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Please log in or register to get started.`);
   }
 
   const loggedID = req.session.user_id["id"];
@@ -195,8 +183,9 @@ app.post("/register",(req,res) => {
   };
   
   const user = users[generateID];
+
+  //set user_id cookie
   req.session.user_id = user;
-  //res.cookie("user_id", user);
   res.redirect("/urls");
 });
 
@@ -235,7 +224,7 @@ app.post("/urls", (req, res) => {
   }
 
   const urlID = generateRandomString();
-  
+
   urlDatabase[urlID] = {
     longURL: longURLBody,
     userID: req.session.user_id["id"]
