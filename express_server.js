@@ -67,12 +67,12 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    hashPassword: bcrypt.hashSync("purple-monkey-dinosaur", 10),
   },
   aJ48lW: {
     id: "aJ48lW",
     email: "test@test.com",
-    password: "123",
+    hashPassword: bcrypt.hashSync("123", 10)
   },
 };
 
@@ -179,9 +179,9 @@ app.post("/register",(req,res) => {
 
   // check if email and password are empty strings.
   const email = req.body.email.trim();
-  const password = req.body.password.trim();
+  const hashPassword = bcrypt.hashSync(req.body.password, 10);
 
-  if (!email || !password) {
+  if (!email || !hashPassword) {
     return res.status(400).send("Invalid credentials");
 
     //check if email has been used before.
@@ -190,15 +190,14 @@ app.post("/register",(req,res) => {
   }
 
   const generateID = generateRandomString();
-  const hashedPassword = bcrypt.hashSync(password,10);
+  //const hashedPassword = bcrypt.hashSync(password,10);
 
   //Add new user object to global users object
   users[generateID] = {
-    "id": generateID,
-    "email":  req.body.email.trim(),
-    "password": hashedPassword
+    id: generateID,
+    email,
+    hashPassword
   };
-
   
   const user = users[generateID];
   res.cookie("user_id", user);
@@ -220,7 +219,7 @@ app.post("/login",(req,res) => {
   } else if (!bcrypt.compareSync(getUserByEmail(email).password, hashedPassword)) {
     return res.status(403).send("Incorrect password. Please try again.");
   }
-
+  //console.log(users);
   const user = getUserByEmail(email);
 
   res.cookie("user_id",user);
