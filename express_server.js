@@ -100,7 +100,6 @@ app.post("/register",(req,res) => {
     return res.status(400).send("Email already in use.");
   }
 
-
   const generateID = generateRandomString();
   
   //Add new user object to global users object
@@ -133,7 +132,12 @@ app.get("/login", (req,res) => {
     user: req.cookies["user_id"],
     urls: urlDatabase,
   };
-  res.render("urls_login",templateVars);
+
+  if(!templateVars.user) {
+    res.render("urls_login",templateVars);
+  }
+  
+  res.redirect("/urls");
 });
 
 //LOGIN Route Post
