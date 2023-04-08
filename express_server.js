@@ -25,7 +25,7 @@ const generateRandomString = () => {
 };
 
 /*
-Function checks if someone tries to register with an email that already exists in users object.
+Function returns user object if inputted email matches existing
 */
 const getUserByEmail = (email) => {
   for (const userId in users) {
@@ -72,7 +72,7 @@ const users = {
 
 // ------------------ ROUTES/ENDPOINTS
 
-//rendering register page
+//REGISTER Route GET
 app.get("/register",(req,res)=> {
   const templateVars = {
     user: req.cookies["user_id"],
@@ -81,7 +81,7 @@ app.get("/register",(req,res)=> {
   res.render("urls_register",templateVars);
 });
 
-//assigns new user id to user upon registeration, appends to users object.
+//REGISTER Route POST
 app.post("/register",(req,res) => {
    
   // check if email and password are empty strings.
@@ -122,7 +122,7 @@ app.get("/urls", (req,res) => {
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
-
+//LOGIN Route GET
 app.get("/login", (req,res) => {
   const templateVars = {
     user: req.cookies["user_id"],
@@ -138,7 +138,7 @@ app.post("/login",(req,res) => {
   //checks if email and password inputs are empty strings.
   if (!email || !password) {
     return res.status(400).send('Invalid credentials');
-    //If a user with that e-mail cannot be found, return a response with a 403 status code.
+  //If a user with that e-mail cannot be found, return a response with a 403 status code.
   } else if (!getUserByEmail(email)) {
     return res.status(403).send("User does not exist.");
     
@@ -176,7 +176,7 @@ app.post("/urls", (req, res) => {
 }
 );
 
-//separate urls for each short url id
+//separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
   const templateVars = {
     id: req.params.id,
@@ -217,6 +217,12 @@ app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
 });
 
+// Catch all route
+app.use((req, res) => {
+  res.status(404).send('Not found!');
+});
+
+// ------------------ LISTENER
 app.listen(PORT, () => {
   console.log(`TinyApp listening on port ${PORT}!`);
 });
