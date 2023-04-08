@@ -38,6 +38,21 @@ const getUserByEmail = (email) => {
   return null;
 };
 
+const urlsForUser = (id) => {
+  let filterUser = {};
+
+  for (const urlID in urlDatabase) {
+    console.log(urlID);
+    if (urlDatabase[urlID].userID === id) {
+      filterUser[urlID] = urlDatabase[urlID].longURL;
+    }
+  }
+  
+  return filterUser;
+};
+  
+    
+
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -55,8 +70,8 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
-  test: {
-    id: "test",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "test@test.com",
     password: "123",
   },
@@ -113,6 +128,14 @@ app.post("/register",(req,res) => {
 });
 
 app.get("/urls", (req,res) => {
+
+  // console.log(urlDatabase);
+  // console.log(users);
+  const loggedID = req.cookies["user_id"]["id"];
+  console.log(loggedID);
+  console.log(urlsForUser(loggedID));
+  //console.log(filterUser);
+
   const templateVars = {
     user: req.cookies["user_id"],
     urls: urlDatabase,
