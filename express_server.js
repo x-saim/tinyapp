@@ -201,7 +201,8 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   //edge case: if user inputs url without http/https protocol
-  if (!req.cookies["user_id"]) {
+  const id = req.cookies["user_id"]
+  if (!id) {
     return res.send("Access denied. You must be logged in to shortern URLs.\n");
   }
 
@@ -214,9 +215,10 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[urlID] = {
     longURL: longURLBody,
-    userID
+    userID: id["id"]
   };
-
+  console.log(urlDatabase);
+  
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
 
@@ -231,7 +233,12 @@ app.get("/urls/:id", (req,res) => {
   if (!urlDatabase[id]) {
     return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
   }
+  
+  const filterUser = urlsForUser(req.cookies["user_id"]["id"]);
 
+  if(!filterUser[id]) {
+    return res.status(403).send("Error: You do not have the rights to access this page.");
+  }
   const templateVars = {
     id,
     longURL: urlDatabase[id]["longURL"],
