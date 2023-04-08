@@ -118,6 +118,9 @@ app.get("/urls", (req,res) => {
     urls: urlDatabase,
   };
 
+  if (!templateVars.user) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To view your shortened urls, please log in or register to get started.`);
+  }
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
@@ -190,7 +193,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[urlID] = {
     longURL: longURLBody,
     userID
-  }
+  };
 
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
