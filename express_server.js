@@ -255,24 +255,40 @@ app.post("/urls", (req, res) => {
 
 //EDIT --- POST route UPDATE a URL resource.
 app.post("/urls/:id", (req, res) => {
- 
+  const userID = req.cookies["user_id"]["id"];
+  const urlID = req.params.id;
+  const url = urlDatabase[urlID];
+
+  if (!userID) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
+  }
   
-  
-  
-  const id = req.params.id;
   let updatedLongURL = req.body.longURL;
-  
   //edge case: if user inputs url without http/https protocol
   if (!updatedLongURL.includes("http://") && !updatedLongURL.includes("https://")) {
     updatedLongURL = "https://" + updatedLongURL;
   }
-  urlDatabase[id]["longURL"] = updatedLongURL;
+
+  url["longURL"] = updatedLongURL;
   res.redirect("/urls");
 });
 
 //DELETE --- POST route that DELETES a URL resource.
 app.post("/urls/:id/delete",(req,res) => {
-  delete urlDatabase[req.params.id];
+  const userID = req.cookies["user_id"]["id"];
+  const urlID = req.params.id;
+  const url = urlDatabase[urlID];
+
+  if (!userID) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
+  }
+
+  if (url["userID"] !== userID) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to delete this URL.\n`);
+  }
+
+  delete urlDatabase[urlID];
+
   res.redirect("/urls");
 });
 
