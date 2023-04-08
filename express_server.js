@@ -208,6 +208,7 @@ app.post("/register",(req,res) => {
 //LOGIN Route Post
 app.post("/login",(req,res) => {
   const {email, password} = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   //checks if email and password inputs are empty strings.
   if (!email || !password) {
@@ -216,7 +217,7 @@ app.post("/login",(req,res) => {
   } else if (!getUserByEmail(email)) {
     return res.status(403).send("User does not exist.");
     
-  } else if (getUserByEmail(email).password !== password) {
+  } else if (!bcrypt.compareSync(getUserByEmail(email).password, hashedPassword)) {
     return res.status(403).send("Incorrect password. Please try again.");
   }
 
