@@ -114,9 +114,8 @@ app.post("/register",(req,res) => {
   };
 
   const user = users[generateID];
-  console.log(user);
   //Set userid cookie
-  res.cookie("user_id",user);
+  res.cookie("user_id", user);
   //Redirect user to /urls page
   res.redirect("/urls");
 });
@@ -138,7 +137,7 @@ app.get("/login", (req,res) => {
   };
 
   if(!templateVars.user) {
-    res.render("urls_login",templateVars);
+   return res.render("urls_login",templateVars);
   }
 
   res.redirect("/urls");
@@ -174,28 +173,43 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     user: req.cookies["user_id"]
   };
+
+  if (!templateVars.user) {
+    return res.redirect("/login");
+  }
   res.render("urls_new",templateVars);
 });
 
 app.post("/urls", (req, res) => {
   //edge case: if user inputs url without http/https protocol
-  let longURL = req.body["longURL"];
-  if (!longURL.includes("http://") && !longURL.includes("https://")) {
-    longURL = "https://" + longURL;
+  if(!req.cookies["urls_id"]) {
+    res.send("Access denied. You must be logged in to shortern URLs.\n")
+  } else {
+    let longURL = req.body["longURL"];
+    if (!longURL.includes("http://") && !longURL.includes("https://")) {
+      longURL = "https://" + longURL;
+    }
+    const id = generateRandomString();
+    urlDatabase[id] = longURL;
+    res.redirect(`/urls/${id}`); // redirect the client to the /urls/:id route for the newly created short URL
   }
-  const id = generateRandomString();
-  urlDatabase[id] = longURL;
-  res.redirect(`/urls/${id}`); // redirect the client to the /urls/:id route for the newly created short URL
+
 }
 );
 
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
+
+  if(!urlDatabase[req.params.id]) {
+    return res.status(400).send("Shortened URL does not exist!");
+  }
+
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
     user: req.cookies["user_id"]
   };
+
   res.render("urls_show",templateVars);
 });
 
