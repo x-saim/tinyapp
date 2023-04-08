@@ -146,15 +146,15 @@ app.post("/login",(req,res) => {
     return res.status(403).send("Incorrect password. Please try again.");
   }
 
-  const user = getUserByEmail(email);  
-  res.cookie("url_id",user.id);
-  res.redirect("/login");
+  const user = getUserByEmail(email); 
+  res.cookie("user_id",user);
+  res.redirect("/urls");
 });
 
 //LOGOUT Route POST
 app.post("/logout",(req,res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.get("/urls/new", (req, res) => {
