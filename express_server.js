@@ -111,7 +111,6 @@ app.get("/urls", (req,res) => {
 
   const loggedID = req.cookies["user_id"]["id"];
   const filterUser = urlsForUser(loggedID);
-  console.log(filterUser);
 
   const templateVars = {
     user: req.cookies["user_id"],
@@ -146,7 +145,6 @@ app.get("/urls/:id", (req,res) => {
     return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
   }
   
-  console.log(filterUser);
   if (!filterUser[id]) {
     return res.status(403).send("Error: You do not have the rights to access this page.");
   }
@@ -235,7 +233,9 @@ app.post("/logout",(req,res) => {
 
 
 app.post("/urls", (req, res) => {
-
+  if (!req.cookies["user_id"]) {
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. To create new shortened urls, please log in or register to get started.\n`);
+  }
   let longURLBody = req.body["longURL"];
   if (!longURLBody.includes("http://") && !longURLBody.includes("https://")) {
     longURLBody = "https://" + longURLBody;
@@ -253,8 +253,12 @@ app.post("/urls", (req, res) => {
 });
 
 
-//POST route UPDATE a URL resource
+//EDIT --- POST route UPDATE a URL resource.
 app.post("/urls/:id", (req, res) => {
+ 
+  
+  
+  
   const id = req.params.id;
   let updatedLongURL = req.body.longURL;
   
@@ -266,7 +270,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-//Add a POST route that removes a URL resource.
+//DELETE --- POST route that DELETES a URL resource.
 app.post("/urls/:id/delete",(req,res) => {
   delete urlDatabase[req.params.id];
   res.redirect("/urls");
