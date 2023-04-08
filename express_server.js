@@ -110,10 +110,10 @@ app.post("/register",(req,res) => {
     "password": req.body.password.trim()
   };
 
-  const userID = users[generateID]["id"];
-
+  const user = users[generateID];
+  console.log(user);
   //Set userid cookie
-  res.cookie("user_id",userID);
+  res.cookie("user_id",user);
   //Redirect user to /urls page
   res.redirect("/urls");
 });
