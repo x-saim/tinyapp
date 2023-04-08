@@ -3,6 +3,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
+const {getUserByEmail} = require("./helpers");
 
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
@@ -32,19 +33,7 @@ const generateRandomString = () => {
   return result;
 };
 
-/*
-Function returns user object if inputted email matches existing
-*/
-const getUserByEmail = (email,database) => {
-  for (const userId in database) {
-    const user = database[userId];
-    if (user.email === email) {
-      return user;
-    }
-  }
 
-  return null;
-};
 
 const urlsForUser = (id) => {
   let filterUser = {};
