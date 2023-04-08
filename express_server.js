@@ -119,7 +119,6 @@ app.get("/urls", (req,res) => {
     user: req.cookies["user_id"],
     urls: urlDatabase,
   };
-  //console.log(templateVars);
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
 });
 
@@ -149,7 +148,7 @@ app.post("/login",(req,res) => {
 
   const user = getUserByEmail(email);  
   res.cookie("url_id",user.id);
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 //LOGOUT Route POST
