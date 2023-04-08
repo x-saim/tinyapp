@@ -1,19 +1,16 @@
 // ------------------ REQUIREMENTS
 const express = require("express");
 const bcrypt = require("bcryptjs");
-//const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
+
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
-//app.use(cookieParser());
 
 app.use(cookieSession({
   name: 'session',
   keys: ['key1','key2']
 }));
-
-
 
 
 const PORT = 8080;
@@ -200,7 +197,6 @@ app.post("/register",(req,res) => {
   }
 
   const generateID = generateRandomString();
-  //const hashedPassword = bcrypt.hashSync(password,10);
 
   //Add new user object to global users object
   users[generateID] = {
@@ -230,14 +226,12 @@ app.post("/login",(req,res) => {
   }
 
   req.session.user_id = user;
-  //res.cookie("user_id",user);
   res.redirect("/urls");
 });
 
 //LOGOUT Route POST
 app.post("/logout",(req,res) => {
   req.session = null;
-  //res.clearCookie("user_id");
   res.redirect("/login");
 });
 
