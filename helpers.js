@@ -32,7 +32,29 @@ const generateRandomString = () => {
   return result;
 };
 
+/**
+ * Returns an object containing only the URLs in the specified database that belong to the specified user ID.
+ *
+ * @param {string} id - The ID of the user whose URLs should be returned.
+ * @param {Object} database - The database object that contains all the URLs.
+ * @returns {Object} An object containing only the URLs in the specified database that belong to the specified user ID.
+ */
+
+const urlsForUser = (id,database) => {
+  let filterUser = {};
+
+  for (const urlID in database) {
+    if (database[urlID].userID === id) {
+      filterUser[urlID] = database[urlID];
+    }
+  }
+  
+  return filterUser;
+};
+
 
 module.exports = {
-  getUserByEmail
+  getUserByEmail,
+  generateRandomString,
+  urlsForUser
 };

@@ -3,7 +3,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
-const {getUserByEmail,generateRandomString} = require("./helpers");
+const {getUserByEmail,generateRandomString,urlsForUser} = require("./helpers");
 
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
@@ -19,18 +19,6 @@ app.use(morgan('dev'));
 app.set("view engine","ejs");
 
 app.use(express.urlencoded({ extended: true })); //express middleware
-
-const urlsForUser = (id) => {
-  let filterUser = {};
-
-  for (const urlID in urlDatabase) {
-    if (urlDatabase[urlID].userID === id) {
-      filterUser[urlID] = urlDatabase[urlID];
-    }
-  }
-  
-  return filterUser;
-};
 
 const urlDatabase = {
   b6UTxQ: {
@@ -94,8 +82,8 @@ app.get("/urls", (req,res) => {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Please log in or register to get started.`);
   }
 
-  const loggedID = req.session.user_id["id"];
-  const filterUser = urlsForUser(loggedID);
+  const loggedUserID = req.session.user_id["id"];
+  const filterUser = urlsForUser(loggedUserID,urlDatabase);
 
   const templateVars = {
     user: req.session.user_id,
@@ -120,7 +108,7 @@ app.get("/urls/new", (req, res) => {
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
   const id = req.params.id;
-  const filterUser = urlsForUser(req.session.user_id["id"]);
+  const filterUser = urlsForUser(req.session.user_id["id"],urlDatabase);
 
   if (!req.session.user_id) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
