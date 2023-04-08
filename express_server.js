@@ -35,9 +35,9 @@ const generateRandomString = () => {
 /*
 Function returns user object if inputted email matches existing
 */
-const getUserByEmail = (email) => {
-  for (const userId in users) {
-    const user = users[userId];
+const getUserByEmail = (email,database) => {
+  for (const userId in database) {
+    const user = database[userId];
     if (user.email === email) {
       return user;
     }
@@ -192,7 +192,7 @@ app.post("/register",(req,res) => {
     return res.status(400).send("Invalid credentials");
 
     //check if email has been used before.
-  } else if (getUserByEmail(email)) {
+  } else if (getUserByEmail(email,users)) {
     return res.status(400).send("Email already in use.");
   }
 
@@ -214,7 +214,7 @@ app.post("/register",(req,res) => {
 //LOGIN Route Post
 app.post("/login",(req,res) => {
   const {email, password} = req.body;
-  const user = getUserByEmail(email);
+  const user = getUserByEmail(email,users);
 
   //checks if email and password inputs are empty strings.
   if (!email || !password) {
