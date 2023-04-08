@@ -170,13 +170,14 @@ app.post("/logout",(req,res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    return res.redirect("/login");
+  }
+  
   const templateVars = {
     user: req.cookies["user_id"]
   };
 
-  if (!templateVars.user) {
-    return res.redirect("/login");
-  }
   res.render("urls_new",templateVars);
 });
 
@@ -201,7 +202,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:id", (req,res) => {
 
   if(!urlDatabase[req.params.id]) {
-    return res.status(400).send("Shortened URL does not exist!");
+    return res.status(400).send("Shortened URL does not exist!\n");
   }
 
   const templateVars = {
