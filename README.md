@@ -17,10 +17,10 @@ The URL Shortener app includes the following features:
 !["Login"](https://github.com/x-saim/tinyapp/blob/master/docs/LOGIN.png?raw=true)
 
 ### Registration Page::
-!["Regisster"](https://github.com/x-saim/tinyapp/blob/master/docs/REGISTER.png?raw=true)
+!["Register"](https://github.com/x-saim/tinyapp/blob/master/docs/REGISTER.png?raw=true)
 
 ### URL Index Page:
-!["My URLs Index Page"](https://github.com/x-saim/tinyapp/blob/master/docs/S1.png?raw=true)
+!["My URLs Index Page"](https://github.com/x-saim/tinyapp/blob/master/docs/URL_INDEX.png?raw=true)
 
 ### Create a new URL:
 !["Page to create a new URL:"](https://github.com/x-saim/tinyapp/blob/master/docs/S2%20-urls.new.png?raw=true)
