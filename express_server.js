@@ -47,7 +47,7 @@ const users = {
 // ------------------ ROUTES/ENDPOINTS
 
 app.get("/", (req,res) => {
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 //REGISTER Route GET
