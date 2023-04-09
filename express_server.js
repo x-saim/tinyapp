@@ -133,6 +133,11 @@ app.get("/urls/:id", (req,res) => {
 //redirect short urls to long urls
 app.get("/u/:id", (req,res) => {
   const id = req.params.id;
+
+  if (!urlDatabase[id]) {
+    return res.status(404).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
+  }
+  
   const loadLongURL = urlDatabase[id]["longURL"];
   res.redirect(loadLongURL);
 });
@@ -154,11 +159,11 @@ app.post("/register",(req,res) => {
   const hashPassword = bcrypt.hashSync(req.body.password, 10);
 
   if (!email || !hashPassword) {
-    return res.status(400).send("Invalid credentials");
+    return res.status(400).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Invalid credentials.`);
 
     //check if email has been used before.
   } else if (getUserByEmail(email,users)) {
-    return res.status(400).send("Email already in use.");
+    return res.status(400).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Email already in use.`);
   }
 
   const generateID = generateRandomString();
@@ -229,7 +234,7 @@ app.post("/urls/:id", (req, res) => {
   const url = urlDatabase[urlID];
 
   if (!user) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
+    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Request denied. Please log in or register to get started.\n`);
   } else if (!url) {
     return res.status(404).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Page does not exist.\n`);
   } else if (url["userID"] !== user.id) {
@@ -251,15 +256,16 @@ app.post("/urls/:id/delete",(req,res) => {
   const user = req.session.user_id;
 
   if (!user) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
+    res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to send this request. Please log in or register to get started.\n`);
+
   } else if (!urlDatabase[urlID]) {
-    return res.status(404).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Page does not exist.\n`);
+    res.status(404).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Page does not exist.\n`);
 
   } else if (urlDatabase[urlID]["userID"] !== user["id"]) {
-    return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to delete this URL.\n`);
+    res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. You do not have the rights to delete this URL.\n`);
+
   } else {
     delete urlDatabase[urlID];
-    console.log("Successfully deleted URL.");
     res.redirect("/urls");
   }
 });
