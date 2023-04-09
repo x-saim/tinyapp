@@ -13,21 +13,22 @@
     <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav d-flex align-items-center">
+      <div class="navbar-nav mr-auto">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        
-        <% if (!user) { %>
-        <a class="nav-item nav-link" href="/register">Register</a>
-        <a class="nav-item nav-link" href="/login">Log in</a>
-
-        <% }  else { %>
-        <h6>Logged in as:  <%= user["email"] %>!</h6>
-        <form method="POST" action="/logout">
-        <button type="submit" class="btn btn-primary">Logout</button>
-        </form> 
-        <% } %>    
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a> 
       </div>
     </div>
+    <div class ="nav navbar-nav">
+      <% if (!user) { %>
+      <a class="nav-item nav-link" href="/register">Register</a>
+      <a class="nav-item nav-link" href="/login">Log in</a>
+
+      <% }  else { %>
+        <h6 class="mt-2 mr-3">Logged in as:  <%= user["email"] %>!</h6>
+        <form method="POST" action="/logout">
+        <button type="submit" class="btn btn-dark">Logout</button>
+        </form> 
+        <% } %>
+      </div>
   </nav>
 </header>
