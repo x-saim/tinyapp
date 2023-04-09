@@ -47,7 +47,7 @@ const users = {
 // ------------------ ROUTES/ENDPOINTS
 
 app.get("/", (req,res) => {
-  if(!req.session.user_id) {
+  if (!req.session.user_id) {
     return res.redirect("/login");
   } else {
     return res.redirect("/urls");
@@ -94,7 +94,7 @@ app.get("/urls", (req,res) => {
     urls: filterUser,
   };
 
-  res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in objet.
+  res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in object.
 });
 
 app.get("/urls/new", (req, res) => {
