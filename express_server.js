@@ -47,7 +47,14 @@ const users = {
 // ------------------ ROUTES/ENDPOINTS
 
 app.get("/", (req,res) => {
-  res.redirect("/login");
+  const userID = req.session.user_id;
+
+  if(!userID) {
+    return res.redirect("/login");
+  } else {
+    return res.redirect("/urls");
+  }
+  
 });
 
 //REGISTER Route GET
