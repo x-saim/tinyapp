@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { getUserByEmail } = require('../helpers.js');
+const { getUserByEmail, urlsForUser} = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
@@ -50,4 +50,29 @@ describe('getUserByEmail', () => {
     assert.isUndefined(user);
   });
 
+});
+
+describe("urlsForUser", function() {
+  const urlDatabase = {
+    "2Ko7eU": { longURL: "https://www.google.com", userID: "LW6p8S" },
+    "6Jm2vQ": { longURL: "https://www.facebook.com", userID: "X9s4tD" },
+    "4Dp5wV": { longURL: "https://www.twitter.com", userID: "LW6p8S" },
+    "9Nk1rX": { longURL: "https://www.github.com", userID: "X9s4tD" }
+  };
+
+  it("should return an empty object if the user has no URLs", function() {
+    const id = "user123";
+    const result = urlsForUser(id, urlDatabase);
+    assert.deepEqual(result, {});
+  });
+
+  it("should return an object containing URLs for the specified user", function() {
+    const id = "LW6p8S";
+    const result = urlsForUser(id, urlDatabase);
+    const expected = {
+      "2Ko7eU": { longURL: "https://www.google.com", userID: "LW6p8S" },
+      "4Dp5wV": { longURL: "https://www.twitter.com", userID: "LW6p8S" }
+    };
+    assert.deepEqual(result, expected);
+  });
 });
