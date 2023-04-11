@@ -107,7 +107,7 @@ app.get("/urls", (req,res) => {
     urls: filterUser,
   };
 
-  console.log(filterUser)
+  console.log(filterUser);
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in object.
 });
 
@@ -263,7 +263,7 @@ app.post("/urls", (req, res) => {
   };
 
   //use moment module to set creation date.
-  urlDatabase[urlID]["date"].push(moment().format('MMMM Do YYYY, h:mm:ss a'))
+  urlDatabase[urlID]["date"].push(moment().format('MMMM Do YYYY, h:mm:ss a'));
 
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });

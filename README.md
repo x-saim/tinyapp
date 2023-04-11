@@ -37,6 +37,7 @@ The URL Shortener app uses the following technologies:
 - bcryptjs
 - cookie-session
 - morgan
+- moment.js
 
 ## Getting Started
 
