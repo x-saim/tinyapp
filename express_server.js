@@ -236,7 +236,7 @@ app.post("/urls", (req, res) => {
 });
 
 
-//EDIT --- POST route UPDATE a URL resource.
+//PUT --- route UPDATES a URL resource.
 app.put("/urls/:id", (req, res) => {
   const user = req.session.user_id;
   const urlID = req.params.id;
@@ -259,7 +259,7 @@ app.put("/urls/:id", (req, res) => {
   }
 });
 
-//DELETE --- POST route that DELETES a URL resource.
+//DELETE --- DELETES a URL resource.
 app.delete("/urls/:id",(req,res) => {
   const urlID = req.params.id;
   const user = req.session.user_id;
