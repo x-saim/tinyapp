@@ -133,6 +133,7 @@ app.get("/urls/:id", (req,res) => {
   } else if (!filterUser[id]) {
     return res.status(403).send("Error: You do not have the rights to access this page.");
   } else {
+
     const templateVars = {
       id,
       longURL: url["longURL"],
@@ -256,7 +257,9 @@ app.post("/urls", (req, res) => {
   urlDatabase[urlID] = {
     longURL: longURLBody,
     userID: req.session.user_id["id"],
-    visits: 0
+    visits: 0,
+    uniqueVisitors: [],
+    timestamp: []
   };
 
   console.log(urlDatabase[urlID]);
