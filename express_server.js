@@ -3,6 +3,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
+const moment = require("moment");
 const methodOverride = require('method-override');
 const {getUserByEmail,generateRandomString,urlsForUser} = require("./helpers");
 
@@ -31,6 +32,7 @@ const urlDatabase = {
     userID: "aJ48lW",
     visits: 0,
     uniqueVisitors: [],
+    date: [moment().format('MMMM Do YYYY, h:mm:ss a')],
     timestamp: []
   },
   i3BoGr: {
@@ -38,6 +40,7 @@ const urlDatabase = {
     userID: "aJ48lW",
     visits: 0,
     uniqueVisitors: [],
+    date: [moment().format('MMMM Do YYYY, h:mm:ss a')],
     timestamp: []
   },
 };
@@ -99,12 +102,12 @@ app.get("/urls", (req,res) => {
 
   const loggedUserID = req.session.user_id["id"];
   const filterUser = urlsForUser(loggedUserID,urlDatabase);
-
   const templateVars = {
     user: req.session.user_id,
     urls: filterUser,
   };
 
+  console.log(filterUser)
   res.render("urls_index",templateVars); //pass first param as template page, and second param as object. Template accesses each of the keys in object.
 });
 
@@ -257,8 +260,12 @@ app.post("/urls", (req, res) => {
     userID: req.session.user_id["id"],
     visits: 0,
     uniqueVisitors: [],
+    date: [],
     timestamp: []
   };
+
+  //use moment module to set creation date.
+  urlDatabase[urlID]["date"].push(moment().format('MMMM Do YYYY, h:mm:ss a'))
 
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
