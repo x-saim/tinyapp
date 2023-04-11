@@ -29,12 +29,14 @@ const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
-    visits: 0
+    visits: 0,
+    uniqueVisitors: []
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
-    visits: 0
+    visits: 0,
+    uniqueVisitors: []
   },
 };
 
@@ -119,41 +121,54 @@ app.get("/urls/new", (req, res) => {
 //separate urls route for each short url id
 app.get("/urls/:id", (req,res) => {
   const id = req.params.id;
-  const filterUser = urlsForUser(req.session.user_id["id"],urlDatabase);
+  const url = urlDatabase[id];
+  const filterUser = urlsForUser(req.session.user_id["id"], urlDatabase);
 
   if (!req.session.user_id) {
     return res.status(403).send(`Status code: ${res.statusCode} - ${res.statusMessage}. Access denied. Please log in or register to get started.`);
-  }
-
-  if (!urlDatabase[id]) {
+  } else if (!url) {
     return res.status(403).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
-  }
-  
-  if (!filterUser[id]) {
+  } else if (!filterUser[id]) {
     return res.status(403).send("Error: You do not have the rights to access this page.");
-  }
-  const templateVars = {
-    id,
-    longURL: urlDatabase[id]["longURL"],
-    visits: urlDatabase[id]["visits"],
-    user: req.session.user_id
-  };
+  } else {
+    const templateVars = {
+      id,
+      longURL: url["longURL"],
+      visits: url["visits"],
+      uniqueVisitorCount: url["uniqueVisitors"].length,
+      user: req.session.user_id
+    };
+    
+    res.render("urls_show",templateVars);
 
-  res.render("urls_show",templateVars);
+  }
 });
 
 //redirect short urls to long urls
 app.get("/u/:id", (req,res) => {
   const id = req.params.id;
+  const url = urlDatabase[id];
 
-  if (!urlDatabase[id]) {
+  if (!url) {
     return res.status(404).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
   } else {
-    urlDatabase[id]["visits"]++;
+    
+    const userID = req.session.user_id;
+    //console.log(userID);
+
+    //if cookie exists and the object is not "tracking" the visitor id then push it
+    if (userID) {
+      if (url["uniqueVisitors"].includes(userID.id) === false) {
+      console.log(url["uniqueVisitors"].includes(userID));
+      url["uniqueVisitors"].push(userID.id);
+      }
+    }
+    //update the visit count for visiting short URL
+    url["visits"]++;
     const loadLongURL = urlDatabase[id]["longURL"];
+    console.log(url["uniqueVisitors"]);
     res.redirect(loadLongURL);
   }
-  
 
 });
 
