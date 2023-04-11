@@ -135,6 +135,7 @@ app.get("/urls/:id", (req,res) => {
   const templateVars = {
     id,
     longURL: urlDatabase[id]["longURL"],
+    visits: urlDatabase[id]["visits"],
     user: req.session.user_id
   };
 
@@ -148,9 +149,7 @@ app.get("/u/:id", (req,res) => {
   if (!urlDatabase[id]) {
     return res.status(404).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
   } else {
-    console.log(urlDatabase[id]["visits"])
     urlDatabase[id]["visits"]++;
-    console.log(urlDatabase[id]["visits"])
     const loadLongURL = urlDatabase[id]["longURL"];
     res.redirect(loadLongURL);
   }
