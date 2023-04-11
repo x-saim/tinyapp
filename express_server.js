@@ -29,10 +29,12 @@ const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
+    visits: 0
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
+    visits: 0
   },
 };
 
@@ -145,10 +147,15 @@ app.get("/u/:id", (req,res) => {
 
   if (!urlDatabase[id]) {
     return res.status(404).send(`Error: ${res.statusCode} - ${res.statusMessage}. Shortened URL does not exist!\n`);
+  } else {
+    console.log(urlDatabase[id]["visits"])
+    urlDatabase[id]["visits"]++;
+    console.log(urlDatabase[id]["visits"])
+    const loadLongURL = urlDatabase[id]["longURL"];
+    res.redirect(loadLongURL);
   }
   
-  const loadLongURL = urlDatabase[id]["longURL"];
-  res.redirect(loadLongURL);
+
 });
 
 // create new route containing json string of urlDatabase obj
