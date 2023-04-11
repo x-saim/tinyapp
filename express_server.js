@@ -170,9 +170,7 @@ app.get("/u/:id", (req,res) => {
     //update the visit count for visiting short URL
     url["visits"]++;
 
-    const timeNow = new Date();
-    const date = new Date(timeNow);
-    url["timestamp"].push(date.toLocaleString());
+    url["timestamp"].push(moment().format('MMMM Do YYYY, h:mm:ss a'));
     const loadLongURL = urlDatabase[id]["longURL"];
     res.redirect(loadLongURL);
   }
