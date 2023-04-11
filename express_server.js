@@ -3,10 +3,15 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
 const morgan = require('morgan');
+const methodOverride = require('method-override');
 const {getUserByEmail,generateRandomString,urlsForUser} = require("./helpers");
+
 
 // ------------------ SETUP / MIDDLEWARE
 const app = express();
+
+//override using a query value
+app.use(methodOverride('_method'))
 
 app.use(cookieSession({
   name: 'session',
@@ -232,7 +237,7 @@ app.post("/urls", (req, res) => {
 
 
 //EDIT --- POST route UPDATE a URL resource.
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const user = req.session.user_id;
   const urlID = req.params.id;
   const url = urlDatabase[urlID];
