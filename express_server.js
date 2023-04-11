@@ -11,7 +11,7 @@ const {getUserByEmail,generateRandomString,urlsForUser} = require("./helpers");
 const app = express();
 
 //override using a query value
-app.use(methodOverride('_method'))
+app.use(methodOverride('_method'));
 
 app.use(cookieSession({
   name: 'session',
@@ -30,13 +30,15 @@ const urlDatabase = {
     longURL: "https://www.tsn.ca",
     userID: "aJ48lW",
     visits: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    timestamp: []
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
     visits: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    timestamp: []
   },
 };
 
@@ -136,6 +138,7 @@ app.get("/urls/:id", (req,res) => {
       longURL: url["longURL"],
       visits: url["visits"],
       uniqueVisitorCount: url["uniqueVisitors"].length,
+      timestamp: url["timestamp"],
       user: req.session.user_id
     };
     
@@ -162,8 +165,13 @@ app.get("/u/:id", (req,res) => {
 
     //update the visit count for visiting short URL
     url["visits"]++;
+
+    const timeNow = new Date();
+    const date = new Date(timeNow);
+
+    console.log(date.toLocaleString());
+    url["timestamp"].push(date.toLocaleString());
     const loadLongURL = urlDatabase[id]["longURL"];
-    console.log(url["uniqueVisitors"]);
     res.redirect(loadLongURL);
   }
 

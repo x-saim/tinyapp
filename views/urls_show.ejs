@@ -63,13 +63,14 @@
           </tr>
         </thead>
         <tbody>
-          
+
+          <% for (let e of timestamp) { %>
           <tr>
             <th scope="row">1</th>
-            <td>X</td>
-            <td>X</td>
+            <td><%= e %></td>
+            <td><%= user["id"] %></td>
           </tr>
-         
+          <% } %>
         </tbody>
       </table>
 
