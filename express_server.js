@@ -169,8 +169,6 @@ app.get("/u/:id", (req,res) => {
 
     const timeNow = new Date();
     const date = new Date(timeNow);
-
-    console.log(date.toLocaleString());
     url["timestamp"].push(date.toLocaleString());
     const loadLongURL = urlDatabase[id]["longURL"];
     res.redirect(loadLongURL);
@@ -262,7 +260,6 @@ app.post("/urls", (req, res) => {
     timestamp: []
   };
 
-  console.log(urlDatabase[urlID]);
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
 
