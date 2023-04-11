@@ -260,7 +260,7 @@ app.put("/urls/:id", (req, res) => {
 });
 
 //DELETE --- POST route that DELETES a URL resource.
-app.post("/urls/:id/delete",(req,res) => {
+app.delete("/urls/:id",(req,res) => {
   const urlID = req.params.id;
   const user = req.session.user_id;
 
