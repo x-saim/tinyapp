@@ -154,15 +154,12 @@ app.get("/u/:id", (req,res) => {
   } else {
     
     const userID = req.session.user_id;
-    //console.log(userID);
 
-    //if cookie exists and the object is not "tracking" the visitor id then push it
-    if (userID) {
-      if (url["uniqueVisitors"].includes(userID.id) === false) {
-      console.log(url["uniqueVisitors"].includes(userID));
+    //if cookie exists and the object is not "tracking" the visitor's id then add it to the uniqueVisitor array.
+    if (userID && !url["uniqueVisitors"].includes(userID.id)) {
       url["uniqueVisitors"].push(userID.id);
-      }
     }
+
     //update the visit count for visiting short URL
     url["visits"]++;
     const loadLongURL = urlDatabase[id]["longURL"];
