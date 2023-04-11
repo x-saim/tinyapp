@@ -235,9 +235,11 @@ app.post("/urls", (req, res) => {
 
   urlDatabase[urlID] = {
     longURL: longURLBody,
-    userID: req.session.user_id["id"]
+    userID: req.session.user_id["id"],
+    visits: 0
   };
 
+  console.log(urlDatabase[urlID]);
   res.redirect(`/urls/${urlID}`); // redirect the client to the /urls/:id route for the newly created short URL
 });
 
